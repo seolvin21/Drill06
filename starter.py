@@ -8,6 +8,26 @@ TUK_ground = load_image('TUK_GROUND.png')
 character = load_image('animation_sheet.png')
 
 
+def character_move():
+    global arrive
+    global hand_pos
+    global x, y, i
+
+    if arrive:
+        return
+
+    if len(hand_pos) > 0:
+        t = i / 100 / 100
+        x = (1 - t) * x + t * hand_pos[0][0]
+        y = (1 - t) * y + t * hand_pos[0][1]
+
+    if i > 300:
+        i = 0
+        arrive = True
+    else:
+        i = i + 1
+
+
 def handle_events():
     global running
     global hand_x, hand_y
@@ -28,11 +48,20 @@ running = True
 hand_x, hand_y = 0, 0
 hand_pos = []
 x, y = TUK_WIDTH // 2, TUK_HEIGHT // 2
+i = 0
+arrive = False
 frame = 0
 
 while running:
     clear_canvas()
     TUK_ground.draw(TUK_WIDTH // 2, TUK_HEIGHT // 2)
+
+    if arrive and len(hand_pos) > 0:
+        i = 0
+        arrive = False
+        hand_pos.pop(0)
+
+    character_move()
 
     for hand_x, hand_y in hand_pos:
         hand.clip_draw(0, 0, 50, 52, hand_x, hand_y)
@@ -42,6 +71,9 @@ while running:
 
     handle_events()
     update_canvas()
+
+    delay(0.01)
+
 
 close_canvas()
 
